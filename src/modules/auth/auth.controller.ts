@@ -27,7 +27,6 @@ const signIn = async (req: Request, res: Response) => {
   const { email, password } = req.body as {
     email: string;
     password: string;
-    role: string;
   };
 
   const result = await authSevice.signIn(email, password);

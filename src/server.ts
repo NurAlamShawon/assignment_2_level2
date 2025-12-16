@@ -2,7 +2,6 @@ import config from "./config"
 import { authRoutes } from "./modules/auth/auth.routes";
 import { bookingsRoute } from "./modules/bookings/bookings.routes";
 import { userRoutes } from "./modules/users/users.routes";
-
 import { vehiclesRoute } from "./modules/vehicles/vehicles.routes";
 
 const express = require('express')

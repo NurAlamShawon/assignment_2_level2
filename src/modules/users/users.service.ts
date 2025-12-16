@@ -21,7 +21,7 @@ const updateUser = async (id: string, payload: Record<string, unknown>) => {
 
   try {
     const result = await pool.query(
-      `UPDATE users SET name=$1 email=$2 role=$3 phone=$4 WHERE id=$5 RETURNING *`,
+      `UPDATE users SET name=$1, email=$2, role=$3, phone=$4 WHERE id=$5 RETURNING *`,
       [name, email, role, phone, id]
     );
 
