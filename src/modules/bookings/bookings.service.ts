@@ -82,18 +82,32 @@ const updateBooking = async (id: string, payload: Record<string, unknown>) => {
   }
 };
 
-const getBooking = async (id: string) => {
-  try {
-    const result = await pool.query(`DELETE FROM users WHERE id=$1`, [id]);
+const getBooking = async (token: string) => {
+ 
+const decoded= jwt.decode(token);
+const role=decoded.role;
+const email =decoded.email;
 
-    if (result.rows.length === 0) {
-      return "User Not Found!";
-    } else {
-      return result.rows[0];
-    }
-  } catch (err) {
-    return err;
-  }
+
+try{
+if(role === "admin"){
+const result= await pool.query(`
+SELECT * FROM bookings`);
+return result;
+}
+
+if(role === "user"){
+const result= await pool.query(`
+SELECT * FROM bookings WHERE email=$1`,[email]);
+
+return result;
+}
+
+}catch(err){
+return err;
+
+}
+
 };
 
 export const bookingService = {
