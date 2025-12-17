@@ -7,15 +7,21 @@ const pool = new Pool({
   connectionString: config.connectionStr,
 });
 
-const signUp = async (email: string, password: string, role: string) => {
+const signUp = async (
+  email: string,
+  password: string,
+  role: string,
+  phone: string,
+  name: string
+) => {
   const hashPass = await bcrypt.hash(password as string, 10);
 
   try {
     const result = await pool.query(
       `
-        INSERT INTO users(email,password,role) VALUES($1,$2,$3) RETURNING *
+        INSERT INTO users(email,password,role,phone,name) VALUES($1,$2,$3,$4,$5) RETURNING *
         `,
-      [email, hashPass, role]
+      [email, hashPass, role, phone, name]
     );
     return result.rows[0];
   } catch (err) {

@@ -1,3 +1,4 @@
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { Pool } from "pg";
 import config from "../../config";
 
@@ -14,6 +15,7 @@ type BookingPayload = {
   customer_id: string;
   rent_start_date: string;
   rent_end_date: string;
+  status: string;
 };
 
 const postBooking = async (payload: BookingPayload) => {
@@ -45,7 +47,7 @@ const postBooking = async (payload: BookingPayload) => {
     );
 
     const result2 = await pool.query(
-      `INSERT INTO vehicles(status, total_price, rent_start_date, rent_end_date , customer_id ,vehicle_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING * `,
+      `INSERT INTO bookings(status, total_price, rent_start_date, rent_end_date , customer_id ,vehicle_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING * `,
       ["active", cost, rent_start_date, rent_end_date, customer_id, vehicle_id]
     );
 
@@ -55,7 +57,12 @@ const postBooking = async (payload: BookingPayload) => {
       if (result2.rows.length === 0) {
         return "Booked is not completed";
       } else {
-        return result2.rows[0];
+        return {
+          data: {
+            ...result2.rows[0],
+            vehicle: result.rows[0],
+          },
+        };
       }
     }
   } catch (err) {
@@ -63,19 +70,63 @@ const postBooking = async (payload: BookingPayload) => {
   }
 };
 
-const updateBooking = async (id: string, payload: Record<string, unknown>) => {
-  const { name, email, phone, role } = payload;
+const updateBooking = async (token: string, id: string, vehicle_id: string) => {
+  const decoded = jwt.decode(token) as JwtPayload;
+  const role = decoded.role;
+
+  const now = new Date();
+  const record = await pool.query(
+    `
+SELECT * FROM bookings WHERE id=$1`,
+    [id]
+  );
+
+  const { rent_start_date } = record.rows[0];
 
   try {
-    const result = await pool.query(
-      `UPDATE users SET name=$1, email=$2, role=$3, phone=$4 WHERE id=$5 RETURNING *`,
-      [name, email, role, phone, id]
-    );
+    if (role === "admin") {
+      const result = await pool.query(
+        `
+UPDATE vehicle SET availability_status=$1 WHERE id=$2 RETURNING *`,
+        ["available", vehicle_id]
+      );
 
-    if (result.rows.length === 0) {
-      return null;
-    } else {
-      return result.rows[0];
+      const result2 = await pool.query(
+        `
+UPDATE bookings SET status=$1 WHERE id=$2 RETURNING *`,
+        ["returned", id]
+      );
+
+      return {
+        data: {
+          ...result.rows[0],
+          vehicle: result2.rows[0],
+        },
+      };
+    }
+
+    if (role === "user") {
+      if (rent_start_date > now) {
+        const result = await pool.query(
+          `
+UPDATE bookings SET status=$1 WHERE id=$2 RETURNING *`,
+          ["cancelled", id]
+        );
+
+        const result2 = await pool.query(
+          `
+UPDATE vehicle SET availability_status=$1 WHERE id=$2 RETURNING *`,
+          ["available", vehicle_id]
+        );
+
+        return {
+          data: {
+            ...result.rows[0],
+          },
+        };
+      } else {
+        return "Rent date has started";
+      }
     }
   } catch (err) {
     return err;
@@ -83,31 +134,29 @@ const updateBooking = async (id: string, payload: Record<string, unknown>) => {
 };
 
 const getBooking = async (token: string) => {
- 
-const decoded= jwt.decode(token);
-const role=decoded.role;
-const email =decoded.email;
+  const decoded = jwt.decode(token) as JwtPayload;
+  const role = decoded?.role;
+  const email = decoded?.email;
 
-
-try{
-if(role === "admin"){
-const result= await pool.query(`
+  try {
+    if (role === "admin") {
+      const result = await pool.query(`
 SELECT * FROM bookings`);
-return result;
-}
+      return result;
+    }
 
-if(role === "user"){
-const result= await pool.query(`
-SELECT * FROM bookings WHERE email=$1`,[email]);
+    if (role === "user") {
+      const result = await pool.query(
+        `
+SELECT * FROM bookings WHERE email=$1`,
+        [email]
+      );
 
-return result;
-}
-
-}catch(err){
-return err;
-
-}
-
+      return result;
+    }
+  } catch (err) {
+    return err;
+  }
 };
 
 export const bookingService = {

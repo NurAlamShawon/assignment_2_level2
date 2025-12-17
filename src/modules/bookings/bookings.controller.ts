@@ -21,8 +21,11 @@ const postBooking = async (req: Request, res: Response) => {
 const updateBooking = async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
 
+  const token =req.body.Authorization;
+  const {vehicle_id}=req.body;
+
   try {
-    const result = bookingService.updateBooking(id, req.body);
+    const result = bookingService.updateBooking(token,id,vehicle_id);
     res.status(200).json({
       success: true,
       message: "Bookings Updated Succesfully!",
@@ -37,10 +40,10 @@ const updateBooking = async (req: Request, res: Response) => {
 };
 
 const getBooking = async (req: Request, res: Response) => {
-  const { id } = req.body.;
+  const token :string = req.body.Authorization;
 
   try {
-    const result = bookingService.getBooking(id);
+    const result = bookingService.getBooking(token);
     res.status(200).json({
       success: true,
       message: "Get Booking Data Successfully!",

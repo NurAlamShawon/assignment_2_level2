@@ -2,13 +2,15 @@ import { Request, Response } from "express";
 import { authSevice } from "./auth.services";
 
 const signUp = async (req: Request, res: Response) => {
-  const { email, password, role } = req.body as {
+  const { email, password, role ,phone , name } = req.body as {
     email: string;
     password: string;
     role: string;
+    phone:string;
+    name:string
   };
 
-  const result = await authSevice.signUp(email, password, role);
+  const result = await authSevice.signUp(email, password, role ,phone,name);
 
   try {
     res.status(200).json({
