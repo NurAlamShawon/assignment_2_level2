@@ -7,10 +7,9 @@ const pool = new Pool({
 
 const getUser = async () => {
   try {
-    const result = await pool.query(`
-        SELECT * FROM users
-        `);
-    return result.rows[0];
+    const result = await pool.query(`SELECT * FROM users`);
+    console.log(result.rows)
+    return result.rows;
   } catch (err) {
     return err;
   }
@@ -25,10 +24,12 @@ const updateUser = async (id: string, payload: Record<string, unknown>) => {
       [name, email, role, phone, id]
     );
 
+    console.log(result);
+
     if (result.rows.length === 0) {
       return null;
     } else {
-      return result.rows[0];
+      return result.rows;
     }
   } catch (err) {
     return err;
