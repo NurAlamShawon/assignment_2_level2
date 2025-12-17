@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { usersService } from "./users.service";
+import { bookingService } from "./bookings.service";
+
 
 const postBooking = async (req: Request, res: Response) => {
   try {
-    const result = usersService.getUser;
+    const result = bookingService.postBooking(req.body);
     res.status(200).json({
       success: true,
-      message: "User Created Succesfully!",
+      message: "Booking Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -21,10 +22,10 @@ const updateBooking = async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
 
   try {
-    const result = usersService.updateUser(id, req.body);
+    const result = bookingService.updateBooking(id, req.body);
     res.status(200).json({
       success: true,
-      message: "User Updated Succesfully!",
+      message: "Bookings Updated Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -39,10 +40,10 @@ const getBooking = async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
 
   try {
-    const result = usersService.deleteUser(id);
+    const result = bookingService.getBooking(id);
     res.status(200).json({
       success: true,
-      message: "User Delete Succesfully!",
+      message: "Get Booking Data Successfully!",
       data: result,
     });
   } catch (err: any) {
