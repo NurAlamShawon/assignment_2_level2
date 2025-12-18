@@ -18,10 +18,17 @@ const getUser = async (req: Request, res: Response) => {
 };
 
 const updateUser = async (req: Request, res: Response) => {
-  const { id } = req.params as { id: string };
+  const id = Number(req.params.userId);
+
+  const token : string | undefined =req.headers.authorization;
+
+  
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
   try {
-    const result =await usersService.updateUser(id, req.body);
+    const result =await usersService.updateUser(id, req.body,token);
     res.status(200).json({
       success: true,
       message: "User Updated Succesfully!",
@@ -36,14 +43,21 @@ const updateUser = async (req: Request, res: Response) => {
 };
 
 const deleteUser = async (req: Request, res: Response) => {
-  const { id } = req.params as { id: string };
+  const id = Number(req.params.userId);
+
+  const token : string | undefined =req.headers.authorization;
+
+
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
   try {
-    const result =await usersService.deleteUser(id);
+    const result =await usersService.deleteUser(id , token);
     res.status(200).json({
       success: true,
       message: "User Delete Succesfully!",
-      data: result,
+      data: `Id:${id} is ${result} Succesfully`,
     });
   } catch (err: any) {
     res.status(500).json({

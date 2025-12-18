@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/",auth("admin","customer"),bookingController.postBooking);
 router.get("/",bookingController.getBooking);
-router.put("/:userId",bookingController.updateBooking);
+router.put("/:bookingId",bookingController.updateBooking);
 
 
 

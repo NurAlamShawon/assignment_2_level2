@@ -5,20 +5,35 @@ const pool = new Pool({
   connectionString: config.connectionStr,
 });
 
+type VehiclePayload = {
+  vehicle_name: string;
+  type: string;
+  registration_number: string;
+  daily_rent_price: number;
+  availability_status: string;
+};
 
-
-const postVehicle = async (payload: Record <string,unknown>) => {
-
-    const {vehicle_name, type, registration_number, daily_rent_price , availability_status} = payload;
-
+const postVehicle = async (payload: VehiclePayload) => {
+  const {
+    vehicle_name,
+    type,
+    registration_number,
+    daily_rent_price,
+    availability_status,
+  } = payload;
 
   try {
     const result = await pool.query(
-      `
-        INSERT INTO vehicles(vehicle_name, type, registration_number, daily_rent_price , availability_status) VALUES($1,$2,$3,$4,$5) RETURNING *
-        `,
-      [vehicle_name, type, registration_number, daily_rent_price , availability_status]
+      `INSERT INTO vehicles(vehicle_name, "type", registration_number, daily_rent_price , availability_status)   VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [
+        vehicle_name,
+        type,
+        registration_number,
+        daily_rent_price,
+        availability_status,
+      ]
     );
+
     return result.rows[0];
   } catch (err) {
     return err;
@@ -30,31 +45,46 @@ const getVehicle = async () => {
     const result = await pool.query(`
         SELECT * FROM vehicles
         `);
-    return result.rows[0];
+    return result.rows;
   } catch (err) {
     return err;
   }
 };
 
-const getVehicleId = async (id : string) => {
+const getVehicleId = async (id: Number) => {
   try {
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
         SELECT * FROM vehicles WHERE id=$1
-        `,[id]);
+        `,
+      [id]
+    );
     return result.rows[0];
   } catch (err) {
     return err;
   }
 };
 
-const updateVehicle =async (id: string, payload: Record<string, unknown>) => {
- const {vehicle_name, type, registration_number, daily_rent_price , availability_status} = payload;
-
+const updateVehicle = async (id: Number, payload: Record<string, unknown>) => {
+  const {
+    vehicle_name,
+    type,
+    registration_number,
+    daily_rent_price,
+    availability_status,
+  } = payload;
 
   try {
     const result = await pool.query(
       `UPDATE vehicles SET vehicle_name=$1 ,type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5 WHERE id=$6 RETURNING *`,
-      [vehicle_name, type, registration_number, daily_rent_price , availability_status, id]
+      [
+        vehicle_name,
+        type,
+        registration_number,
+        daily_rent_price,
+        availability_status,
+        id,
+      ]
     );
 
     if (result.rows.length === 0) {
@@ -67,36 +97,32 @@ const updateVehicle =async (id: string, payload: Record<string, unknown>) => {
   }
 };
 
-const deleteVehicle = async (id: string) => {
-
-
+const deleteVehicle = async (id: Number) => {
   try {
-    const result = await pool.query(
-      `DELETE FROM vehicles WHERE id=$1`,
-      [ id]
-    );
+    const test = await pool.query(`SELECT * FROM vehicles WHERE id=$1`, [id]);
 
-    if (result.rows.length === 0) {
-      return "Vehicle Not Found!";
-    } else {
-      return result.rows[0];
+    console.log(test)
+
+    if (!(test.rows[0].availability_status === "booked")) {
+      const result = await pool.query(`DELETE FROM vehicles WHERE id=$1`, [id]);
+
+      console.log(result)
+
+      if (result.rowCount === 1) {
+        return result.command;
+      } else {
+        return "Unsuccessfull";
+      }
     }
   } catch (err) {
     return err;
   }
 };
 
-
-
-
-
-
-
-
 export const vehiclesService = {
-   postVehicle,
+  postVehicle,
   getVehicle,
- getVehicleId,
- deleteVehicle,
- updateVehicle
+  getVehicleId,
+  deleteVehicle,
+  updateVehicle,
 };

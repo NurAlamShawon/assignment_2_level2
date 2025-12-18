@@ -5,10 +5,10 @@ import { vehiclesService } from "./vehicles.service";
 
 const postVehicle = async (req: Request, res: Response) => {
   try {
-    const result = vehiclesService.postVehicle(req.body);
+    const result =await vehiclesService.postVehicle(req.body);
     res.status(200).json({
       success: true,
-      message: "User Created Succesfully!",
+      message: "Vehicle Created Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -20,10 +20,10 @@ const postVehicle = async (req: Request, res: Response) => {
 };
 const getVehicle = async (req: Request, res: Response) => {
   try {
-    const result = vehiclesService.getVehicle;
+    const result =await vehiclesService.getVehicle();
     res.status(200).json({
       success: true,
-      message: "User Created Succesfully!",
+      message: "All Vehicle Fetched Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -35,10 +35,10 @@ const getVehicle = async (req: Request, res: Response) => {
 };
 
 const getVehicleId = async (req: Request, res: Response) => {
- const { id } = req.params as { id: string };
+  const id = Number(req.params.vehicleId);
   try {
     
-    const result = vehiclesService.getVehicleId(id);
+    const result =await vehiclesService.getVehicleId(id);
     res.status(200).json({
       success: true,
       message: "User Created Succesfully!",
@@ -53,13 +53,13 @@ const getVehicleId = async (req: Request, res: Response) => {
 };
 
 const updateVehicle = async (req: Request, res: Response) => {
-  const { id } = req.params as { id: string };
+  const id = Number(req.params.vehicleId);
 
   try {
-    const result = vehiclesService.updateVehicle(id, req.body);
+    const result =await vehiclesService.updateVehicle(id, req.body);
     res.status(200).json({
       success: true,
-      message: "User Updated Succesfully!",
+      message: "Vehicle Updated Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -71,14 +71,14 @@ const updateVehicle = async (req: Request, res: Response) => {
 };
 
 const deleteVehicle = async (req: Request, res: Response) => {
-  const { id } = req.params as { id: string };
+  const id = Number(req.params.vehicleId);
 
   try {
-    const result = vehiclesService.deleteVehicle(id);
+    const result =await vehiclesService.deleteVehicle(id);
     res.status(200).json({
       success: true,
       message: "Vehicle Delete Succesfully!",
-      data: result,
+       data: `Vehicle_id:${id} is ${result} Succesfully`,
     });
   } catch (err: any) {
     res.status(500).json({

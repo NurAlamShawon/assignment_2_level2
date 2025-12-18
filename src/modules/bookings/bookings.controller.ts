@@ -4,7 +4,7 @@ import { bookingService } from "./bookings.service";
 
 const postBooking = async (req: Request, res: Response) => {
   try {
-    const result = bookingService.postBooking(req.body);
+    const result =await bookingService.postBooking(req.body);
     res.status(200).json({
       success: true,
       message: "Booking Succesfully!",
@@ -19,13 +19,19 @@ const postBooking = async (req: Request, res: Response) => {
 };
 
 const updateBooking = async (req: Request, res: Response) => {
-  const { id } = req.params as { id: string };
+    const id = Number(req.params.bookingId);
 
-  const token =req.body.Authorization;
+    const token : string | undefined =req.headers.authorization;
+
+
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
   const {vehicle_id}=req.body;
 
   try {
-    const result = bookingService.updateBooking(token,id,vehicle_id);
+    const result =await bookingService.updateBooking(token,id,vehicle_id);
     res.status(200).json({
       success: true,
       message: "Bookings Updated Succesfully!",
@@ -40,10 +46,16 @@ const updateBooking = async (req: Request, res: Response) => {
 };
 
 const getBooking = async (req: Request, res: Response) => {
-  const token :string = req.body.Authorization;
+   const token : string | undefined =req.headers.authorization;
+
+
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
 
   try {
-    const result = bookingService.getBooking(token);
+    const result =await bookingService.getBooking(token);
     res.status(200).json({
       success: true,
       message: "Get Booking Data Successfully!",
