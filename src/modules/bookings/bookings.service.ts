@@ -147,7 +147,7 @@ UPDATE vehicles SET availability_status=$1 WHERE id=$2 RETURNING *`,
           },
         };
       } else {
-        return "Rent date has started";
+        return "Rent date has started & delete booking is not possible!";
       }
     }
   } catch (err) {

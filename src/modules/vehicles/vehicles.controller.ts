@@ -4,8 +4,14 @@ import { vehiclesService } from "./vehicles.service";
 
 
 const postVehicle = async (req: Request, res: Response) => {
+  const token : string | undefined =req.headers.authorization;
+
+
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
   try {
-    const result =await vehiclesService.postVehicle(req.body);
+    const result =await vehiclesService.postVehicle(req.body , token);
     res.status(200).json({
       success: true,
       message: "Vehicle Created Succesfully!",
@@ -41,7 +47,7 @@ const getVehicleId = async (req: Request, res: Response) => {
     const result =await vehiclesService.getVehicleId(id);
     res.status(200).json({
       success: true,
-      message: "User Created Succesfully!",
+      message: "Vehicle Data Fetched Succesfully!",
       data: result,
     });
   } catch (err: any) {
@@ -72,9 +78,16 @@ const updateVehicle = async (req: Request, res: Response) => {
 
 const deleteVehicle = async (req: Request, res: Response) => {
   const id = Number(req.params.vehicleId);
+   const token : string | undefined =req.headers.authorization;
+
+
+  if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
 
   try {
-    const result =await vehiclesService.deleteVehicle(id);
+    const result =await vehiclesService.deleteVehicle(id ,token);
     res.status(200).json({
       success: true,
       message: "Vehicle Delete Succesfully!",
