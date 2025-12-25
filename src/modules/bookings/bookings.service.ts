@@ -162,25 +162,22 @@ const getBooking = async (token: string) => {
 
   try {
     if (role === "admin") {
-      const result = await pool.query(`
-SELECT * FROM bookings`);
+      const result = await pool.query(`SELECT * FROM bookings`);
       return result.rows;
     }
 
     if (role === "customer") {
-      const result0 = await pool.query(
-        `
-SELECT * FROM users WHERE email=$1`,
-        [email]
-      );
+      const result0 = await pool.query(`SELECT * FROM users WHERE email=$1`,[email]);
 
-      const result = await pool.query(
-        `
-SELECT * FROM bookings WHERE customer_id=$1`,
-        [result0.rows[0].id]
-      );
+      const result = await pool.query(`SELECT * FROM bookings WHERE customer_id=$1`, [result0.rows[0].id]);
 
-      return result.rows;
+      if(result0.rows.length == 0 ){
+        return "User not found"
+      }
+      if(result.rows.length == 0 ){
+        return "Booking not found"
+      }
+       return result.rows;
     }
   } catch (err) {
     return err;

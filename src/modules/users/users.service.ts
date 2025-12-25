@@ -40,7 +40,7 @@ const updateUser = async (
 
       console.log(result);
       if (result.rows.length === 0) {
-        return null;
+        return "User not found";
       } else {
         return result.rows;
       }
@@ -55,7 +55,7 @@ const updateUser = async (
 
         console.log(result);
         if (result.rows.length === 0) {
-          return null;
+          return "User not found";
         } else {
           return result.rows;
         }
