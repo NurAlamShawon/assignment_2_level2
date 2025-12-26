@@ -159,6 +159,7 @@ const getBooking = async (token: string) => {
   const decoded = jwt.decode(token) as JwtPayload;
   const role = decoded?.role;
   const email = decoded?.email;
+  console.log(decoded, role, email);
 
   try {
     if (role === "admin") {
@@ -167,17 +168,28 @@ const getBooking = async (token: string) => {
     }
 
     if (role === "customer") {
-      const result0 = await pool.query(`SELECT * FROM users WHERE email=$1`,[email]);
+      const result0 = await pool.query(`SELECT * FROM users WHERE email=$1`, [
+        email,
+      ]);
 
-      const result = await pool.query(`SELECT * FROM bookings WHERE customer_id=$1`, [result0.rows[0].id]);
+      console.log(result0);
+      console.log(result0.rowCount);
 
-      if(result0.rows.length == 0 ){
-        return "User not found"
+      if (result0.rowCount === 0) {
+        return "User not found";
       }
-      if(result.rows.length == 0 ){
-        return "Booking not found"
+
+      const result = await pool.query(
+        `SELECT * FROM bookings WHERE customer_id=$1`,
+        [result0.rows[0].id]
+      );
+      console.log(result);
+      console.log(result.rowCount);
+
+      if (result.rowCount === 0) {
+        return "Booking not found";
       }
-       return result.rows;
+      return result.rows[0];
     }
   } catch (err) {
     return err;
